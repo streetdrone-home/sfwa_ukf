@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="3">
+    <name>sfwa_ukf</name>
+    <version>0.0.1</version>
+    <description>ROV state estimation pipeline</description>
+
+    <maintainer email="sina.aghli@picknik.ai">Sina Aghli</maintainer>
+    <author email="sina.aghli@picknik.ai">Sina Aghli</author>
+
+    <license>BSD</license>
+
+    <url type="website">https://github.com/PickNikRobotics/sfwa_ukf</url>
+    <url type="bugtracker">https://github.com/PickNikRobotics/sfwa_ukf/issues</url>
+    <url type="repository">https://github.com/PickNikRobotics/sfwa_ukf/</url>
+
+    <buildtool_depend>ament_cmake</buildtool_depend>s
+    <buildtool_depend>eigen3_cmake_module</buildtool_depend>
+    <buildtool_export_depend>eigen3_cmake_module</buildtool_export_depend>
+
+    <depend>eigen</depend>
+    <depend>rclcpp</depend>
+
+    <test_depend>ament_lint_auto</test_depend>
+    <test_depend>ament_lint_common</test_depend>
+    <test_depend>ament_cmake_google_benchmark</test_depend>
+
+    <export>
+        <build_type>ament_cmake</build_type>
+    </export>
+</package>
