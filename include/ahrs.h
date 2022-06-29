@@ -23,6 +23,11 @@ SOFTWARE.
 #ifndef AHRS_H
 #define AHRS_H
 
+#include <algorithm>
+#include <stdint.h>
+
+#include "sfwa_ukf/Config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

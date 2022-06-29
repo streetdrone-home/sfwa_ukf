@@ -11,6 +11,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp
   eigen3_cmake_module
   Eigen3
+  sensor_msgs
 )
 
 # Define floating point precision
@@ -30,12 +31,13 @@ endforeach()
 add_library(
   ${PROJECT_NAME}
   src/sfwa_ukf.cpp
+  src/ahrs.cpp
 )
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 target_include_directories(${PROJECT_NAME}
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 # Declare a C++ executable
 add_executable(

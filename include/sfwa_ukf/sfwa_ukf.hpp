@@ -32,10 +32,6 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Sina Aghli
-   Desc: TODO(GITHUB_NAME):
-*/
-
 #pragma once
 
 // C++
@@ -43,18 +39,71 @@
 #include <string>
 
 // ROS
+#include <eigen3/Eigen/Eigen>
+
 #include <rclcpp/logging.hpp>
 #include <rclcpp/rclcpp.hpp>
 
+#include <sensor_msgs/msg/imu.hpp>
+
+#include "ahrs.h"
+
 namespace sfwa_ukf
 {
+struct ImuState
+{
+  builtin_interfaces::msg::Time time;
+  Eigen::Vector3d acc;
+  Eigen::Vector3d angvel;
+  Eigen::Quaterniond orientation;
+  ImuState& operator=(const ImuState& rhs)
+  {
+    acc.noalias() = rhs.acc;
+    angvel.noalias() = rhs.angvel;
+    orientation = rhs.orientation;
+    time = rhs.time;
+    return *this;
+  }
+};
+
 class sfwa_ukf : public rclcpp::Node
 {
 public:
   /** \brief Constructor */
   sfwa_ukf();
 
+  ImuState imu_;
+  ImuState prev_imu_;
+
 private:
+  void InitFilter();
+  void UpdateMeasurements();
+  void ImuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
+  {
+    prev_imu_ = imu_;
+    imu_.time = msg->header.stamp;
+    imu_.acc = Eigen::Vector3d(msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z);
+    imu_.angvel = Eigen::Vector3d(msg->angular_velocity.x, msg->angular_velocity.y, msg->angular_velocity.z);
+    imu_.orientation =
+        Eigen::Quaterniond(msg->orientation.w, msg->orientation.x, msg->orientation.y, msg->orientation.z);
+
+    // update ukf measurements
+    UpdateMeasurements();
+
+    // ukf update
+    float timediff = imu_.time.sec - prev_imu_.time.sec;
+    std::cout << timediff << std::endl;
+    ukf_iterate(timediff);
+
+    // print estimation result
+    ukf_state_t curr_est_result;
+    ukf_get_state(&curr_est_result);
+    Eigen::Quaterniond curr_attitude(curr_est_result.attitude[3], curr_est_result.attitude[0],
+                                     curr_est_result.attitude[1], curr_est_result.attitude[2]);
+    std::cout << curr_attitude.toRotationMatrix().eulerAngles(0, 1, 2).transpose() << std::endl;
+  }
+
+  rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_subscription_;
 };  // end class sfwa_ukf
 
 // Create std pointers for this class

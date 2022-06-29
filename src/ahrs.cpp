@@ -1,4 +1,4 @@
-#include "sfwa_ukf/ahrs.h"
+#include "ahrs.h"
 
 #include <cmath>
 
@@ -395,7 +395,7 @@ void ukf_iterate(float dt)
 
       /* Clip parameters to physically reasonable values. */
       ahrs_errors.state.set_field<MagneticFieldNorm>(
-          std::max(0.2f, std::min(0.7f, ahrs_errors.state.get_field<MagneticFieldNorm>())));
+          std::max(0.2, std::min(0.7, ahrs_errors.state.get_field<MagneticFieldNorm>())));
 
       sfwa_ukf::Vector<3> temp;
       temp = ahrs_errors.state.get_field<AccelerometerBias>();
@@ -405,9 +405,9 @@ void ukf_iterate(float dt)
       ahrs_errors.state.set_field<AccelerometerBias>(temp);
 
       temp = ahrs_errors.state.get_field<MagnetometerScaleFactor>();
-      temp[0] = std::max(real_t(0.5f), std::min(2.0f, temp[0]));
-      temp[1] = std::max(real_t(0.5f), std::min(2.0f, temp[1]));
-      temp[2] = std::max(real_t(0.5f), std::min(2.0f, temp[2]));
+      temp[0] = std::max(real_t(0.5), std::min(2.0, temp[0]));
+      temp[1] = std::max(real_t(0.5), std::min(2.0, temp[1]));
+      temp[2] = std::max(real_t(0.5), std::min(2.0, temp[2]));
       ahrs_errors.state.set_field<MagnetometerScaleFactor>(temp);
 
       step = 0;

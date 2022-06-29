@@ -42,6 +42,39 @@ namespace sfwa_ukf
 sfwa_ukf::sfwa_ukf() : Node("sfwa_ukf")
 {
   RCLCPP_INFO(get_logger(), "Initializing sfwa_ukf...");
+  imu_subscription_ = this->create_subscription<sensor_msgs::msg::Imu>(
+      "/imu_xsens_mti_ros", 1, std::bind(&sfwa_ukf::ImuCallback, this, std::placeholders::_1));
+
+  InitFilter();
+}
+
+void sfwa_ukf::InitFilter()
+{
+  std::cout << "Initializing UKF!" << std::endl;
+  RCLCPP_INFO(this->get_logger(), "Initializing UKF!");
+
+  ukf_init();
+
+  // set initial state
+  ukf_state_t init_state;
+  init_state.attitude[0] = imu_.orientation.x();
+  init_state.attitude[1] = imu_.orientation.y();
+  init_state.attitude[2] = imu_.orientation.z();
+  init_state.attitude[3] = imu_.orientation.w();
+  init_state.acceleration[0] = 0;
+  init_state.acceleration[1] = 0;
+  init_state.acceleration[2] = 0;
+  init_state.angular_velocity[0] = 0;
+  init_state.angular_velocity[1] = 0;
+  init_state.angular_velocity[2] = 0;
+
+  ukf_set_state(&init_state);
+}
+
+void sfwa_ukf::UpdateMeasurements()
+{
+  ukf_sensor_set_gyroscope(imu_.angvel[0], imu_.angvel[1], imu_.angvel[2]);
+  ukf_sensor_set_accelerometer(imu_.acc[0], imu_.acc[1], imu_.acc[2]);
 }
 
 }  // end namespace sfwa_ukf
